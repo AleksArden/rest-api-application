@@ -1,18 +1,23 @@
 const express = require('express')
 
-const { getListContacts, getContactById, createContact, deleteContact, putContact } = require('../../controllers/contactsControllers.js')
+const { getListContacts, getContactById, createContact, deleteContact, putContact, patchContact } = require('../../controllers/contactsControllers.js')
 
-const { chekContactFields, chekHasBodyContact, checkContactId } = require('../../middlewares/contactMiddleware.js')
+const { checkValidateContactFields, checkHasBodyPutContact, checkContactId, checkBodyPatchContact, checkHasFieldFavorite } = require('../../middlewares/contactMiddleware.js')
 
 const router = express.Router()
 
 router.route('/')
   .get(getListContacts)
-  .post(chekHasBodyContact, chekContactFields, createContact)
+  .post(checkHasFieldFavorite, checkValidateContactFields, createContact)
+
+router.use('/:contactId', checkContactId)
 
 router.route('/:contactId')
-  .get(checkContactId, getContactById)
-  .delete(checkContactId, deleteContact)
-  .put(chekHasBodyContact, chekContactFields, checkContactId, putContact)
+  .get(getContactById)
+  .delete(deleteContact)
+  .put(checkHasBodyPutContact, checkValidateContactFields, putContact)
+
+router.route('/:contactId/favorite')
+  .patch(checkBodyPatchContact, checkContactId, patchContact)
 
 module.exports = router

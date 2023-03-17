@@ -1,6 +1,6 @@
-const { v4: uuidv4 } = require('uuid')
 const catchAsync = require('../helpers/catchAsync')
-const { listContacts, getById, addContact, removeContact, updateContact } = require("../models/contacts")
+
+const { listContacts, getById, addContact, removeContact, updateContact, updateStatusContact } = require("../models/contacts")
 
 /**
  * get list of contacts
@@ -30,14 +30,8 @@ const getContactById = catchAsync(async (req, res,) => {
  * @param {contact<Object>}
  */
 const createContact = catchAsync(async (req, res) => {
-    const { name, email, phone } = req.body
-    const newContact = {
-        name,
-        email,
-        phone,
-        id: uuidv4(),
-    }
-    await addContact(newContact)
+
+    const newContact = await addContact(req.body)
 
     res.status(201).json(newContact)
 })
@@ -55,7 +49,7 @@ const deleteContact = catchAsync(async (req, res) => {
 })
 
 /**
- * update contact
+ *put update contact
  * @param {Contact<Object>}
  * @param {id<string>}
  */
@@ -67,11 +61,25 @@ const putContact = catchAsync(async (req, res) => {
 
     res.status(200).json(newContact)
 })
+/**
+ * patch update contact
+ *  @param {Contact<Object>}
+ * @param {id<string>}
+ */
+const patchContact = catchAsync(async (req, res) => {
+    const { contactId } = req.params
+    const body = req.body
+
+    const editContact = await updateStatusContact(contactId, body)
+
+    res.status(200).json(editContact)
+})
 
 module.exports = {
     getListContacts,
     getContactById,
     createContact,
     deleteContact,
-    putContact
+    putContact,
+    patchContact,
 }

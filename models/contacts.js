@@ -1,4 +1,4 @@
-const fs = require('fs/promises')
+const Contact = require('./contactModel')
 
 /**
  * get list of contacts
@@ -6,9 +6,7 @@ const fs = require('fs/promises')
  */
 const listContacts = async () => {
   try {
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
-
-    return contacts
+    return await Contact.find()
 
   } catch (error) {
     console.log(error)
@@ -22,9 +20,7 @@ const listContacts = async () => {
  */
 const getById = async (contactId) => {
   try {
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
-
-    return contacts.find(({ id }) => id === contactId)
+    return await Contact.findById(contactId)
 
   } catch (error) {
     console.log(error)
@@ -37,11 +33,7 @@ const getById = async (contactId) => {
  */
 const removeContact = async (contactId) => {
   try {
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
-
-    const newContacts = contacts.filter(({ id }) => id !== contactId)
-
-    await fs.writeFile('./models/contacts.json', JSON.stringify(newContacts))
+    await Contact.findByIdAndDelete(contactId)
 
   } catch (error) {
     console.log(error)
@@ -51,14 +43,11 @@ const removeContact = async (contactId) => {
 /**
  * create new contact
  * @param {contact<Object>}
+ * @returns {contact<Object>}
  */
 const addContact = async (body) => {
   try {
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
-
-    contacts.push(body)
-
-    await fs.writeFile('././models/contacts.json', JSON.stringify(contacts))
+    return await Contact.create(body)
 
   } catch (error) {
     console.log(error)
@@ -66,29 +55,31 @@ const addContact = async (body) => {
 }
 
 /**
- * update contact
+ * put update contact
  * @param {Contact<Object>}
  * @param {id<string>}
  * @returns {contact<Object>}
  */
 const updateContact = async (contactId, body) => {
   try {
-    const { name, email, phone } = body
+    return await Contact.findByIdAndUpdate(contactId, body, { new: true })
 
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
+  } catch (error) {
+    console.log(error)
+  }
+}
 
-    const contact = contacts.find(({ id }) => id === contactId)
+/**
+ * patch update contact
+ * @param {id<string>} contactId 
+ * @param {contact<Object>} body 
+ * @returns {contact<Object>}
+ */
+const updateStatusContact = async (contactId, body) => {
+  try {
 
-    contact.name = name
-    contact.email = email
-    contact.phone = phone
+    return await Contact.findByIdAndUpdate(contactId, body, { new: true })
 
-    const contactIdx = contacts.findIndex(({ id }) => id === contactId)
-    contacts[contactIdx] = contact
-
-    await fs.writeFile('./models/contacts.json', JSON.stringify(contacts))
-
-    return contact
   } catch (error) {
     console.log(error)
   }
@@ -100,4 +91,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact
 }
