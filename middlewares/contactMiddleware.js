@@ -1,48 +1,91 @@
-const fs = require('fs/promises')
-const catchAsync = require('../helpers/catchAsync')
-const dataValidator = require("../helpers/datavalidator")
+const Contact = require("../models/contactModel");
+const { Types } = require("mongoose");
+const catchAsync = require("../helpers/catchAsync");
+
+const {
+    dataValidatorCreate,
+    validatorFavoriteField,
+} = require("../helpers/datavalidator");
 
 /**
  * Check body has data
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns {Object} 
+ * @param {Contact<Object>}
+ * @returns {Object}
  */
-const chekHasBodyContact = (req, res, next) => {
+const checkHasBodyPutContact = (req, res, next) => {
 
     if (!Object.keys(req.body).length) {
-        res.status(400).json({ message: 'missing fields' })
-        return
+        res.status(400).json({ message: "missing fields" });
+        return;
     }
-    next()
-}
+    next();
+};
+
+/**
+ * Check body patch has wrong field favorite
+ * @param {Object}
+ * @returns {Object}
+ */
+const checkBodyPatchContact = (req, res, next) => {
+
+    if (!Object.keys(req.body).length) {
+        res.status(400).json({ message: "missing field favorite" });
+        return;
+    }
+    const { error, value } = validatorFavoriteField(req.body);
+
+    if (error) {
+        res.status(400).json({ message: `${error.details[0].message}` });
+    }
+    req.body = value;
+    next();
+};
+
+/**
+ * Check has fields of contact and check has favorite field
+ * @param {contact<Object>}
+ * @returns {Object}
+ */
+const checkHasFieldFavorite = (req, res, next) => {
+    const body = req.body;
+
+    if (!Object.keys(body).length) {
+        res.status(400).json({ message: "missing fields" });
+        return;
+    }
+
+    const favorite = Object.keys(body).includes("favorite");
+    if (!favorite) {
+        body.favorite = false;
+    }
+    req.body = body;
+    next();
+};
 
 /**
  * Validates fields
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {Contact<Object>} 
  * @returns {Object}
  */
-const chekContactFields = (req, res, next) => {
+const checkValidateContactFields = (req, res, next) => {
 
-    const { error, value } = dataValidator(req.body)
+    const { error, value } = dataValidatorCreate(req.body);
     if (error) {
+
         if (error.details[0].context.limit) {
-            res.status(400).json({ message: 'name length must be at least 3 characters long and less than or equal to 24 characters long' })
-            return
+            res.status(400).json({ message: "name length must be at least 3 characters long and less than or equal to 24 characters long" });
+            return;
         }
         if (error.details[0].context.value) {
-            res.status(400).json({ message: 'must be a valid email' })
-            return
+            res.status(400).json({ message: `${error.details[0].message}` });
+            return;
         }
-        res.status(400).json({ message: `missing required ${error.details[0].context?.key} field` })
-        return
+        res.status(400).json({ message: `missing required ${error.details[0].context?.key} field` });
+        return;
     }
-    req.body = value
-    next()
-}
+    req.body = value;
+    next();
+};
 
 /**
  * Validates id
@@ -50,20 +93,23 @@ const chekContactFields = (req, res, next) => {
  * @returns {id<string>}
  */
 const checkContactId = catchAsync(async (req, res, next) => {
+    const { contactId } = req.params;
 
-    const { contactId } = req.params
-    const contacts = JSON.parse(await fs.readFile('./models/contacts.json'))
+    const isIdValid = Types.ObjectId.isValid(contactId);
 
-    const contact = contacts.find(({ id }) => id === contactId)
+    if (!isIdValid) return res.status(404).json({ message: "Not found" });
 
-    if (!contact) return res.status(404).json({ message: 'Not found' })
+    const contactExists = await Contact.exists({ _id: contactId });
 
-    next()
-})
+    if (!contactExists) return res.status(404).json({ message: "Not found" });
 
+    next();
+});
 
 module.exports = {
-    chekContactFields,
-    chekHasBodyContact,
-    checkContactId
-}
+    checkValidateContactFields,
+    checkHasBodyPutContact,
+    checkContactId,
+    checkBodyPatchContact,
+    checkHasFieldFavorite,
+};
