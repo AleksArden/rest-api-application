@@ -18,6 +18,6 @@ router.route('/:contactId')
   .put(checkHasBodyPutContact, checkValidateContactFields, putContact)
 
 router.route('/:contactId/favorite')
-  .patch(checkBodyPatchContact, checkContactId, patchContact)
+  .patch(checkBodyPatchContact, patchContact)
 
 module.exports = router
