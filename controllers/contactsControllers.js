@@ -1,13 +1,20 @@
 const catchAsync = require('../helpers/catchAsync')
-
 const { listContacts, getById, addContact, removeContact, updateContact, updateStatusContact } = require("../models/contacts")
 
 /**
  * get list of contacts
+ * @param {user<object>}
+ * @param {query<Object>}
  */
-const getListContacts = catchAsync(async (_, res) => {
+const getListContacts = catchAsync(async (req, res) => {
+    const { limit, page, favorite } = req.query
+    const pagPage = +page || 1
+    const pagLimit = +limit || 20
+    const skip = (pagPage - 1) * pagLimit
 
-    const contacts = await listContacts()
+    const dataQuery = { skip, pagLimit, favorite: Boolean(favorite) }
+
+    const contacts = await listContacts(req.user, dataQuery)
 
     res.status(200).json(contacts)
 })
@@ -17,7 +24,6 @@ const getListContacts = catchAsync(async (_, res) => {
  * @param {id<string>}
  */
 const getContactById = catchAsync(async (req, res,) => {
-
     const { contactId } = req.params
 
     const contact = await getById(contactId)
@@ -31,7 +37,12 @@ const getContactById = catchAsync(async (req, res,) => {
  */
 const createContact = catchAsync(async (req, res) => {
 
-    const newContact = await addContact(req.body)
+    const dataContact = {
+        owner: req.user._id,
+        ...req.body
+    }
+
+    const newContact = await addContact(dataContact)
 
     res.status(201).json(newContact)
 })
@@ -69,6 +80,7 @@ const putContact = catchAsync(async (req, res) => {
 const patchContact = catchAsync(async (req, res) => {
     const { contactId } = req.params
     const body = req.body
+
 
     const editContact = await updateStatusContact(contactId, body)
 

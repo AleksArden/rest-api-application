@@ -2,11 +2,22 @@ const Contact = require('./contactModel')
 
 /**
  * get list of contacts
+ * @param {user<Object>}
+ * @param {query<Object>}
  * @returns {contacts<Array>}
  */
-const listContacts = async () => {
+const listContacts = async (user, { favorite, skip, pagLimit }) => {
   try {
-    return await Contact.find()
+    const findOptions = favorite === true ? { favorite: { $eq: favorite } } : { owner: user }
+
+    if (favorite === true) {
+      findOptions.owner = user
+    }
+    const contactsQuery = Contact.find(findOptions)
+
+    contactsQuery.skip(skip).limit(pagLimit)
+
+    return await contactsQuery
 
   } catch (error) {
     console.log(error)
@@ -47,8 +58,7 @@ const removeContact = async (contactId) => {
  */
 const addContact = async (body) => {
   try {
-    return await Contact.create(body)
-
+    return await (await Contact.create(body))
   } catch (error) {
     console.log(error)
   }

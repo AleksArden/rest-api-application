@@ -4,7 +4,11 @@ const { getListContacts, getContactById, createContact, deleteContact, putContac
 
 const { checkValidateContactFields, checkHasBodyPutContact, checkContactId, checkBodyPatchContact, checkHasFieldFavorite } = require('../../middlewares/contactMiddleware.js')
 
+const { protect } = require('../../middlewares/userMiddleware')
+
 const router = express.Router()
+
+router.use(protect)
 
 router.route('/')
   .get(getListContacts)

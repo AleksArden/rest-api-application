@@ -2,7 +2,8 @@ const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
 const mongoose = require('mongoose')
-const contactsRouter = require('./routes/api/contacts')
+const contactsRouter = require('./routes/api/contactsRouter')
+const userRouter = require('./routes/user/userRouter')
 require('dotenv').config()
 
 const app = express()
@@ -15,6 +16,7 @@ app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
 
+app.use('/user', userRouter)
 app.use('/api/contacts', contactsRouter)
 
 mongoose.connect(MONGO_URL)
