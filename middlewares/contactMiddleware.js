@@ -5,7 +5,7 @@ const catchAsync = require("../helpers/catchAsync");
 const {
     dataValidatorCreate,
     validatorFavoriteField,
-} = require("../helpers/datavalidator");
+} = require("../helpers/contactValidator");
 
 /**
  * Check body has data
