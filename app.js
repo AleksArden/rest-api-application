@@ -16,7 +16,7 @@ app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
 
-app.use('/user', userRouter)
+app.use('/users', userRouter)
 app.use('/api/contacts', contactsRouter)
 
 mongoose.connect(MONGO_URL)
