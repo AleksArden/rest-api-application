@@ -1,4 +1,4 @@
-const Contact = require('./contactModel')
+const Contact = require('../models/contactModel')
 
 /**
  * get list of contacts

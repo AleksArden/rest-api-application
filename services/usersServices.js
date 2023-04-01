@@ -1,4 +1,6 @@
-const User = require('./userModel')
+const User = require('../models/userModel')
+const Jimp = require("jimp")
+const fs = require('fs').promises
 
 /**
  *  create user
@@ -55,8 +57,33 @@ const refreshToken = async (id, token) => {
     await User.findByIdAndUpdate(id, { token: token })
 }
 
+/**
+ *  moving and editing a file
+ * @param {string} tmpUpload 
+ * @param {string} publicUpload 
+ */
+
+const moveAndEditFile = async (tmpUpload, publicUpload) => {
+    try {
+        await fs.rename(tmpUpload, publicUpload)
+        Jimp.read(publicUpload)
+            .then((img) => {
+                return img
+                    .resize(250, 250)
+                    .quality(60)
+                    .write(publicUpload)
+
+            })
+    } catch (error) {
+        await fs.unlink(tmpUpload)
+        console.log(error)
+    }
+}
+
 module.exports = {
     createUser,
     getUser,
-    getUserbyId, refreshToken
+    getUserbyId,
+    refreshToken,
+    moveAndEditFile
 }
