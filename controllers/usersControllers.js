@@ -10,7 +10,7 @@ const avatarDir = path.join(process.cwd(), 'public', 'avatars')
 const PORT = process.env.PORT
 
 /**
- * user registration 
+ * user registration  
  * @param {user<Object>}
  */
 

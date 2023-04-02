@@ -34,7 +34,6 @@ userSchema.pre('save', async function (next) {
         this.avatarURL = `https://www.gravatar.com/avatar/${emailHash}.jpg?d=monsterid`
     }
 
-
     if (!this.isModified('password')) return next();
 
     const salt = await bcrypt.genSalt(10);

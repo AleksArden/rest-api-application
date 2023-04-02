@@ -58,7 +58,7 @@ const removeContact = async (contactId) => {
  */
 const addContact = async (body) => {
   try {
-    return await (await Contact.create(body))
+    return await Contact.create(body)
   } catch (error) {
     console.log(error)
   }

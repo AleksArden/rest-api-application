@@ -11,9 +11,6 @@ const userValidator = (data) => {
     return Schema.validate(data)
 }
 
-
-
 module.exports = {
     userValidator,
-
 }
