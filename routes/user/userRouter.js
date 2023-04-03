@@ -3,12 +3,14 @@ const express = require('express')
 const { checkValidateUser,
     compareEmailUsers,
     checkValidationLogin,
-    protect } = require('../../middlewares/userMiddleware')
+    protect,
+    uploadUserAvatar } = require('../../middlewares/userMiddleware')
 
 const { registration,
     login,
     logout,
-    currentUser } = require('../../controllers/usersControllers')
+    currentUser,
+    updateUserAvatar } = require('../../controllers/usersControllers')
 
 const router = express.Router()
 
@@ -18,12 +20,15 @@ router.route('/register')
 router.route('/login')
     .post(checkValidateUser, checkValidationLogin, login)
 
+router.use(protect)
+
 router.route('/logout')
-    .post(protect, logout)
+    .post(logout)
 
 router.route('/current')
-    .post(protect, currentUser)
+    .post(currentUser)
 
-
+router.route('/avatars')
+    .patch(uploadUserAvatar, updateUserAvatar)
 
 module.exports = router

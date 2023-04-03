@@ -1,7 +1,9 @@
 const User = require('../models/userModel')
+const multer = require('multer')
+
 const catchAsync = require('../helpers/catchAsync')
 const { userValidator } = require('../helpers/userValidator')
-const { getUser, getUserbyId } = require('../models/users')
+const { getUser, getUserbyId } = require('../services/usersServices')
 const { decodedToken } = require('../services/token')
 
 /**
@@ -11,14 +13,13 @@ const { decodedToken } = require('../services/token')
  */
 
 const checkValidateUser = (req, res, next) => {
-    const { error, value } = userValidator(req.body)
+    const { error } = userValidator(req.body)
 
     if (error) {
         const errorValidation = error.details[0].context?.key
         res.status(400).json({ message: `${errorValidation} is required  or invalid ${errorValidation}` })
         return
     }
-    req.body = value
     next()
 }
 
@@ -85,9 +86,44 @@ const protect = catchAsync(async (req, res, next) => {
     next()
 })
 
+
+/**
+ * Multer middleware, avatar check 
+ * @param {file<object>} 
+ * @returns {file<object>}
+ */
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'tmp')
+    },
+    filename: (req, file, cb) => {
+
+        cb(null, `${req.user._id}-${file.originalname}`)
+    },
+    limits: {
+        fileSize: 1024 * 1024
+    }
+})
+
+const multerFilter = (req, file, cb) => {
+
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true)
+    } else {
+        cb(new Error('I don`t know what is it... '), false)
+    }
+}
+
+const uploadUserAvatar = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+}).single('avatar')
+
 module.exports = {
     checkValidateUser,
     compareEmailUsers,
     checkValidationLogin,
     protect,
+    uploadUserAvatar,
 }

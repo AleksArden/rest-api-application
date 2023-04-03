@@ -1,4 +1,4 @@
-const Contact = require('./contactModel')
+const Contact = require('../models/contactModel')
 
 /**
  * get list of contacts
@@ -58,7 +58,7 @@ const removeContact = async (contactId) => {
  */
 const addContact = async (body) => {
   try {
-    return await (await Contact.create(body))
+    return await Contact.create(body)
   } catch (error) {
     console.log(error)
   }

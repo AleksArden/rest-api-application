@@ -1,5 +1,5 @@
 const catchAsync = require('../helpers/catchAsync')
-const { listContacts, getById, addContact, removeContact, updateContact, updateStatusContact } = require("../models/contacts")
+const { listContacts, getById, addContact, removeContact, updateContact, updateStatusContact } = require("../services/contactsServices")
 
 /**
  * get list of contacts
