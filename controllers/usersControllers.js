@@ -1,24 +1,31 @@
 const catchAsync = require('../helpers/catchAsync')
+const uuid = require('uuid').v4;
+require('dotenv').config()
 const path = require('path')
+
 const { createUser,
     refreshToken,
-    moveAndEditFile } = require('../services/usersServices')
+    moveAndEditFile,
+} = require('../services/usersServices')
 const { signToken } = require('../services/token')
+const sendEmail = require('../helpers/sendEmail')
 
-const DOMAIN = require('../constans/domain')
 const avatarDir = path.join(process.cwd(), 'public', 'avatars')
-const PORT = process.env.PORT
+const { BASE_URL } = process.env
 
 /**
  * user registration  
  * @param {user<Object>}
  */
-
 const registration = catchAsync(async (req, res) => {
+    req.body.verificationToken = uuid()
+
     const newUser = await createUser(req.body)
 
     newUser.password = undefined
-    console.log(newUser)
+
+    await sendEmail(newUser)
+
     const { email, subscription, avatarURL } = newUser
 
     res.status(201).json({
@@ -27,12 +34,38 @@ const registration = catchAsync(async (req, res) => {
 })
 
 /**
+ * verify email
+ * @param {user<Object>}
+ */
+const verifyEmail = catchAsync(async (req, res) => {
+    const user = req.user
+    user.verificationToken = 'null'
+    user.verify = true
+
+    await user.save()
+
+    res.status(200).json({ message: 'Verification successful' })
+})
+
+/**
+ * resend verify email
+ * @param {user<Object>}
+ */
+const resendVerifyEmail = catchAsync(async (req, res) => {
+    const user = req.user
+
+    await sendEmail(user)
+
+    res.status(200).json({ message: 'Verification email sent' })
+})
+
+/**
  * create token and user login
  * @param {Object}
  */
 
 const login = catchAsync(async (req, res) => {
-    const user = req.body
+    const user = req.user
 
     const token = signToken(user.id)
 
@@ -74,7 +107,8 @@ const currentUser = (req, res,) => {
  */
 
 const updateUserAvatar = catchAsync(async (req, res) => {
-    const { user } = req
+    const user = req.user
+    
     const { path: tmpUpload, filename } = req.file
 
     const publicUpload = path.join(avatarDir, filename)
@@ -82,7 +116,7 @@ const updateUserAvatar = catchAsync(async (req, res) => {
     await moveAndEditFile(tmpUpload, publicUpload)
 
     const avatar = path.join('avatars', filename)
-    const avatarURL = `http://${DOMAIN}${PORT}/${avatar}`
+    const avatarURL = `${BASE_URL}/${avatar}`
 
     user.avatarURL = avatarURL
     await user.save()
@@ -92,8 +126,10 @@ const updateUserAvatar = catchAsync(async (req, res) => {
 
 module.exports = {
     registration,
+    verifyEmail,
     login,
     logout,
     currentUser,
-    updateUserAvatar
+    updateUserAvatar,
+    resendVerifyEmail
 }

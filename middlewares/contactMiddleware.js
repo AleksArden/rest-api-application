@@ -69,7 +69,7 @@ const checkHasFieldFavorite = (req, res, next) => {
  */
 const checkValidateContactFields = (req, res, next) => {
 
-    const { error, value } = dataValidatorCreate(req.body);
+    const { error } = dataValidatorCreate(req.body);
     if (error) {
 
         if (error.details[0].context.limit) {
@@ -83,7 +83,7 @@ const checkValidateContactFields = (req, res, next) => {
         res.status(400).json({ message: `missing required ${error.details[0].context?.key} field` });
         return;
     }
-    req.body = value;
+
     next();
 };
 
