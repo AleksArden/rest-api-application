@@ -20,8 +20,10 @@ const userSchema = new Schema({
 
     verificationToken: {
         type: String,
-        required: [true, 'Verify token is required'],
-        nullable: true,
+        required: [function () {
+            return this.verificationToken !== null;
+        }, 'Verify token is required'],
+
     },
 
     avatarURL: String,
@@ -52,6 +54,12 @@ userSchema.pre('save', async function (next) {
 })
 
 userSchema.methods.checkPassword = (candidate, hash) => bcrypt.compare(candidate, hash)
+
+// console.log("?????????", this.verificationToken)
+// if (this.verificationToken === null) {
+//     console.log("!!!!!!!!!!!")
+//     this.verificationToken.type = Boolean
+// }
 
 const User = model('User', userSchema)
 

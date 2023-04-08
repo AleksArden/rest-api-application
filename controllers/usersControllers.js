@@ -124,6 +124,23 @@ const updateUserAvatar = catchAsync(async (req, res) => {
     res.status(200).json({ avatarURL })
 })
 
+/**
+ * Change subscription
+ * @param {Object} subscription
+ * @param {Object} user
+ */
+
+const updateSubscription = catchAsync(async (req, res) => {
+    const { subscription } = req.body
+    const user = req.user
+    user.subscription = subscription
+
+    await user.save()
+
+    res.status(200).json({ subscription: user.subscription })
+
+})
+
 module.exports = {
     registration,
     verifyEmail,
@@ -131,5 +148,6 @@ module.exports = {
     logout,
     currentUser,
     updateUserAvatar,
-    resendVerifyEmail
+    resendVerifyEmail,
+    updateSubscription
 }

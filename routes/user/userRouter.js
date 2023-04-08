@@ -6,14 +6,17 @@ const { checkValidateUser,
     protect,
     uploadUserAvatar,
     checkVerificationToken,
-    checkResendVerifyEmail } = require('../../middlewares/userMiddleware')
+    checkResendVerifyEmail,
+    checkSubscriptionEnum } = require('../../middlewares/userMiddleware')
 
 const { registration,
     login,
     verifyEmail,
     logout,
     currentUser,
-    updateUserAvatar, resendVerifyEmail } = require('../../controllers/usersControllers')
+    updateUserAvatar,
+    resendVerifyEmail,
+    updateSubscription } = require('../../controllers/usersControllers')
 
 const router = express.Router()
 
@@ -32,7 +35,7 @@ router.route('/login')
 router.use(protect)
 
 router.route('/')
-    .patch()
+    .patch(checkSubscriptionEnum, updateSubscription)
 
 router.route('/logout')
     .post(logout)

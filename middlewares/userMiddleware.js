@@ -2,9 +2,10 @@ const User = require('../models/userModel')
 const multer = require('multer')
 
 const catchAsync = require('../helpers/catchAsync')
-const { userValidator, emailValidator } = require('../helpers/userValidator')
+const { userValidator, emailValidator, subscriptionValidator } = require('../helpers/userValidator')
 const { getUser, getUserbyId } = require('../services/usersServices')
 const { decodedToken } = require('../services/token')
+const { reset } = require('nodemon')
 
 /**
  * check validate user for regisration and login
@@ -78,7 +79,6 @@ const checkResendVerifyEmail = catchAsync(async (req, res, next) => {
     if (user.verify) {
         return res.status(400).json({ message: 'Verification has already been passed' })
     }
-
     req.user = user
     next()
 })
@@ -162,14 +162,26 @@ const multerFilter = (req, file, cb) => {
     }
 }
 
-
-
 const uploadUserAvatar = multer({
     storage: multerStorage,
     fileFilter: multerFilter,
 }).single('avatar')
 
+/**
+ * Check validate subscription
+ * @param {Object} subscription
+ * @returns {Subscription<Object>}
+ */
 
+const checkSubscriptionEnum = (req, res, next) => {
+
+    const { error } = subscriptionValidator(req.body)
+
+    if (error) {
+        return res.status(400).json({ message: 'Subscription is required or value is invalid' })
+    }
+    next()
+}
 
 
 module.exports = {
@@ -180,4 +192,5 @@ module.exports = {
     uploadUserAvatar,
     checkVerificationToken,
     checkResendVerifyEmail,
+    checkSubscriptionEnum
 }

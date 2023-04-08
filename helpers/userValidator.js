@@ -19,7 +19,16 @@ const emailValidator = (data) => {
     return Schema.validate(data)
 }
 
+const subscriptionValidator = (data) => {
+
+    const Schema = Joi.object({
+        subscription: Joi.string().required().valid("starter", "pro", "business")
+    })
+    return Schema.validate(data)
+}
+
 module.exports = {
     userValidator,
     emailValidator,
+    subscriptionValidator
 }

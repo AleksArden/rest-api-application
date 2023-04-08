@@ -1,5 +1,6 @@
 require('dotenv').config()
 const nodemailer = require('nodemailer')
+
 const { BASE_URL, SENDGRID_USERNAME, SENDGRID_APIKEY, SENDGRID_FROM } = process.env
 
 const config = {
