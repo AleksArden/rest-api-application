@@ -8,7 +8,7 @@ const { createUser,
     moveAndEditFile,
 } = require('../services/usersServices')
 const { signToken } = require('../services/token')
-const sendEmail = require('../helpers/sendEmail')
+const sendEmail = require('../services/sendEmail')
 
 const avatarDir = path.join(process.cwd(), 'public', 'avatars')
 const { BASE_URL } = process.env
@@ -39,7 +39,7 @@ const registration = catchAsync(async (req, res) => {
  */
 const verifyEmail = catchAsync(async (req, res) => {
     const user = req.user
-    user.verificationToken = 'null'
+    user.verificationToken = null
     user.verify = true
 
     await user.save()
@@ -108,7 +108,7 @@ const currentUser = (req, res,) => {
 
 const updateUserAvatar = catchAsync(async (req, res) => {
     const user = req.user
-    
+
     const { path: tmpUpload, filename } = req.file
 
     const publicUpload = path.join(avatarDir, filename)

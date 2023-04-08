@@ -31,6 +31,9 @@ router.route('/login')
 
 router.use(protect)
 
+router.route('/')
+    .patch()
+
 router.route('/logout')
     .post(logout)
 
