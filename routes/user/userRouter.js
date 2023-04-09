@@ -4,23 +4,38 @@ const { checkValidateUser,
     compareEmailUsers,
     checkValidationLogin,
     protect,
-    uploadUserAvatar } = require('../../middlewares/userMiddleware')
+    uploadUserAvatar,
+    checkVerificationToken,
+    checkResendVerifyEmail,
+    checkSubscriptionEnum } = require('../../middlewares/userMiddleware')
 
 const { registration,
     login,
+    verifyEmail,
     logout,
     currentUser,
-    updateUserAvatar } = require('../../controllers/usersControllers')
+    updateUserAvatar,
+    resendVerifyEmail,
+    updateSubscription } = require('../../controllers/usersControllers')
 
 const router = express.Router()
 
 router.route('/register')
     .post(checkValidateUser, compareEmailUsers, registration)
 
+router.route('/verify/:verificationToken')
+    .get(checkVerificationToken, verifyEmail)
+
+router.route('/verify')
+    .post(checkResendVerifyEmail, resendVerifyEmail)
+
 router.route('/login')
     .post(checkValidateUser, checkValidationLogin, login)
 
 router.use(protect)
+
+router.route('/')
+    .patch(checkSubscriptionEnum, updateSubscription)
 
 router.route('/logout')
     .post(logout)
@@ -30,5 +45,7 @@ router.route('/current')
 
 router.route('/avatars')
     .patch(uploadUserAvatar, updateUserAvatar)
+
+
 
 module.exports = router

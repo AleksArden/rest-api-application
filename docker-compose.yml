@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+   image: mongo
+   volumes:
+    - ./db:/data/db
+  backend: 
+    build: ./
+    ports:
+      - '3000:3000'
+    restart: always
+    depends_on:
+      - db

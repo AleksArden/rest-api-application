@@ -13,6 +13,19 @@ const userSchema = new Schema({
         unique: true,
     },
 
+    verify: {
+        type: Boolean,
+        default: false,
+    },
+
+    verificationToken: {
+        type: String,
+        required: [function () {
+            return this.verificationToken !== null;
+        }, 'Verify token is required'],
+
+    },
+
     avatarURL: String,
 
     subscription: {
