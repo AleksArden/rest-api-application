@@ -55,12 +55,6 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.checkPassword = (candidate, hash) => bcrypt.compare(candidate, hash)
 
-// console.log("?????????", this.verificationToken)
-// if (this.verificationToken === null) {
-//     console.log("!!!!!!!!!!!")
-//     this.verificationToken.type = Boolean
-// }
-
 const User = model('User', userSchema)
 
 module.exports = User
